@@ -167,7 +167,7 @@ else {
                             <tr>
                                 <td class="text-center"><?= !empty($data['id']) ? '<a href="https://statistik.d-u-v.org/getresultperson.php?runner=' . $data['id'] . '" target="_blank">' . $data['name'] . '</a>' : $data['name'] ?></td>
                                 <td class="text-center"><?= $data['gender'] ?? '-' ?></td>
-                                <td class="text-center"><?= $data['birthdate'] ?? '-' ?></td>
+                                <td class="text-center"><?= $data['birth'] ?? '-' ?></td>
                                 <td class="text-center"><?= $data['categ'] ?? '-' ?></td>
                                 <td class="text-center"><?= $data['country'] ?? '-' ?></td>
                                 <td class="text-center"><?= $data['club'] ?? '-' ?></td>
