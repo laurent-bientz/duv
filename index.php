@@ -25,6 +25,12 @@ if ('1' === ($_POST['submit'] ?? false)) {
                 $response = $client->request('GET', sprintf('https://statistik.d-u-v.org/searchrunner.php?sname=%s&Submit.x=22&Submit.y=7', $line));
                 $html = $response->getContent();
 
+                // no result, try to reverse firstname & lastname
+                if (str_contains($html, '0 search results')) {
+                    $response = $client->request('GET', sprintf('https://statistik.d-u-v.org/searchrunner.php?sname=%s&Submit.x=22&Submit.y=7', join(', ', array_reverse(explode(', ', $line)))));
+                    $html = $response->getContent();
+                }
+
                 // several results
                 if (str_contains($html, 'Searching the Name field for')) {
                     $domCrawler = new Crawler('<html><body><h2>' . Strings::substrAfterFirstDelimiter($html, '<h2>Searching the Name field for:'));
