@@ -140,14 +140,12 @@ else {
                 <div class="form-group">
                     <label for="distance">Sort by</label>
                     <select name="distance" id="distance">
-                        <option value="50km"<?= '50k' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>50k</option>
-                        <option value="50mi"<?= '50mi' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>50M</option>
-                        <option value="100km"<?= '100km' === ($_POST['distance'] ?? '100km') ? " selected='selected'" : ''?>>100k</option>
-                        <option value="100mi"<?= '100mi' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>100M</option>
-                        <option value="6h"<?= '6h' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>6H</option>
-                        <option value="12h"<?= '12h' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>12H</option>
-                        <option value="24h"<?= '24h' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>24H</option>
-                        <option value="48h"<?= '48h' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>48H</option>
+                        <?php foreach($bests as $key => $value): ?>
+                            <?php if (!str_contains($key, '_seconds')): ?>
+                                <th class="text-center" scope="col"><?= $key ?></th>
+                                <option value="<?= $key ?>"<?= $key === ($_POST['distance'] ?? ('100km' === $key ? '100km': '')) ? " selected='selected'" : ''?>><?= $key ?></option>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="form-group">
