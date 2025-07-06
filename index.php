@@ -187,7 +187,7 @@ else {
                                 <td class="text-center"><?= $data['club'] ?? '-' ?></td>
                                 <?php foreach($bests as $key => $value): ?>
                                     <?php if (!str_contains($key, '_seconds')): ?>
-                                        <td class="text-center"><?= !empty($data['bests'][$key]) ? (!str_contains($data['bests'][$key], ':') ? (number_format((float)$data['bests'][$key], 2) . 'k') : $data['bests'][$key]) : '-' ?></td>
+                                        <td class="text-center"><?= !empty($data['bests'][$key]) ? (!str_contains($data['bests'][$key], ':') ? (number_format((float)$data['bests'][$key], 2) . ' k') : ((!empty($parts = explode(':', $data['bests'][$key])) && 3 === \count($parts)) ? $parts[0] . 'h' . $parts[1] . '\'' . $parts[2] : $data['bests'][$key])) : '-' ?></td>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                                 <td class="text-center">
