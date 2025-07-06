@@ -111,7 +111,7 @@ if (!empty($gender)) {
     $runners = array_values(array_filter($runners, fn ($runner) => $gender === $runner['gender']));
 }
 $sort = ($_POST['distance'] ?? '100km');
-if (str_contains($sort, 'km')) {
+if (!str_contains($sort, 'h')) {
     usort($runners, fn($a, $b) => $a['bests'][$sort . '_seconds'] === $b['bests'][$sort . '_seconds'] ? 0 : (($a['bests'][$sort . '_seconds'] < $b['bests'][$sort . '_seconds']) ? -1 : 1));
 }
 else {
