@@ -98,12 +98,17 @@ if ('1' === ($_POST['submit'] ?? false)) {
                 $line = preg_replace('/\s/', ' ', $line);
                 $runners[] = [
                     'name' => strtoupper($line),
+                    'gender' => '',
                     'bests' => $bests,
                     'homonyms' => [],
                 ];
             }
         }
     }
+}
+$gender = ($_POST['gender'] ?? '');
+if (!empty($gender)) {
+    $runners = array_values(array_filter($runners, fn ($runner) => $gender === $runner['gender']));
 }
 $sort = ($_POST['distance'] ?? '100km');
 if (str_contains($sort, 'km')) {
@@ -136,6 +141,14 @@ else {
                 <div class="form-group">
                     <label for="data">List of runners</label>
                     <textarea class="form-control" name="data" id="data" rows="20" placeholder="One per line"><?= $_POST['data'] ?? ''?></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="distance">Gender</label>
+                    <select name="gender" id="gender">
+                        <option value="">Both</option>
+                        <option value="♂️"<?= ('♂️' === $_POST['gender'] ? " selected='selected'" : '')?>>Men</option>
+                        <option value="♀️"<?= ('♀️' === $_POST['gender'] ? " selected='selected'" : '')?>>Women</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="distance">Sort by</label>
