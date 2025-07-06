@@ -8,19 +8,40 @@ use App\Strings;
 
 $client = HttpClient::create();
 $runners = [];
+$bests = [
+    '50km' => null,
+    '50km_seconds' => 900000,
+    '50mi' => null,
+    '50mi_seconds' => 900000,
+    '100km' => null,
+    '100km_seconds' => 900000,
+    '100mi' => null,
+    '100mi_seconds' => 900000,
+    '6h' => 0,
+    '12h' => 0,
+    '24h' => 0,
+    '48h' => 0,
+];
 if ('1' === ($_POST['submit'] ?? false)) {
     if (!empty($_POST['data'])) {
         $lines = explode("\n", $_POST['data']);
         foreach ($lines as $line) {
             $homonyms = [];
+
+            // clean delimiters
             $line = str_replace(["\r", ", ", ","], ["", " ", ""], $line);
-            if (str_contains($line, "\t") && !empty($infos = explode("\t", $line)) && 1 < \count($infos)) {
-                $line = $infos[0] . ' ' . $infos[1];
-            }
+
+            // clean accents
+            $a = ['À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ', 'Ā', 'ā', 'Ă', 'ă', 'Ą', 'ą', 'Ć', 'ć', 'Ĉ', 'ĉ', 'Ċ', 'ċ', 'Č', 'č', 'Ď', 'ď', 'Đ', 'đ', 'Ē', 'ē', 'Ĕ', 'ĕ', 'Ė', 'ė', 'Ę', 'ę', 'Ě', 'ě', 'Ĝ', 'ĝ', 'Ğ', 'ğ', 'Ġ', 'ġ', 'Ģ', 'ģ', 'Ĥ', 'ĥ', 'Ħ', 'ħ', 'Ĩ', 'ĩ', 'Ī', 'ī', 'Ĭ', 'ĭ', 'Į', 'į', 'İ', 'ı', 'Ĳ', 'ĳ', 'Ĵ', 'ĵ', 'Ķ', 'ķ', 'Ĺ', 'ĺ', 'Ļ', 'ļ', 'Ľ', 'ľ', 'Ŀ', 'ŀ', 'Ł', 'ł', 'Ń', 'ń', 'Ņ', 'ņ', 'Ň', 'ň', 'ŉ', 'Ō', 'ō', 'Ŏ', 'ŏ', 'Ő', 'ő', 'Œ', 'œ', 'Ŕ', 'ŕ', 'Ŗ', 'ŗ', 'Ř', 'ř', 'Ś', 'ś', 'Ŝ', 'ŝ', 'Ş', 'ş', 'Š', 'š', 'Ţ', 'ţ', 'Ť', 'ť', 'Ŧ', 'ŧ', 'Ũ', 'ũ', 'Ū', 'ū', 'Ŭ', 'ŭ', 'Ů', 'ů', 'Ű', 'ű', 'Ų', 'ų', 'Ŵ', 'ŵ', 'Ŷ', 'ŷ', 'Ÿ', 'Ź', 'ź', 'Ż', 'ż', 'Ž', 'ž', 'ſ', 'ƒ', 'Ơ', 'ơ', 'Ư', 'ư', 'Ǎ', 'ǎ', 'Ǐ', 'ǐ', 'Ǒ', 'ǒ', 'Ǔ', 'ǔ', 'Ǖ', 'ǖ', 'Ǘ', 'ǘ', 'Ǚ', 'ǚ', 'Ǜ', 'ǜ', 'Ǻ', 'ǻ', 'Ǽ', 'ǽ', 'Ǿ', 'ǿ'];
+            $b = ['A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 's', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y', 'A', 'a', 'A', 'a', 'A', 'a', 'C', 'c', 'C', 'c', 'C', 'c', 'C', 'c', 'D', 'd', 'D', 'd', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'G', 'g', 'G', 'g', 'G', 'g', 'G', 'g', 'H', 'h', 'H', 'h', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'IJ', 'ij', 'J', 'j', 'K', 'k', 'L', 'l', 'L', 'l', 'L', 'l', 'L', 'l', 'l', 'l', 'N', 'n', 'N', 'n', 'N', 'n', 'n', 'O', 'o', 'O', 'o', 'O', 'o', 'OE', 'oe', 'R', 'r', 'R', 'r', 'R', 'r', 'S', 's', 'S', 's', 'S', 's', 'S', 's', 'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y', 'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o'];
+            $line = str_replace($a, $b, $line);
+
+            // place coma
             $line = Strings::substrBeforeLastDelimiter($line, " ") . ', ' . Strings::substrAfterLastDelimiter($line, " ") . ' ';
             if (empty($line)) {
                 continue;
             }
+
             try {
                 $response = $client->request('GET', sprintf('https://statistik.d-u-v.org/searchrunner.php?sname=%s&Submit.x=22&Submit.y=7', $line));
                 $html = $response->getContent();
@@ -31,7 +52,7 @@ if ('1' === ($_POST['submit'] ?? false)) {
                     $html = $response->getContent();
                 }
 
-                // several results
+                // several results, get the first and extract homonyms
                 if (str_contains($html, 'Searching the Name field for')) {
                     $domCrawler = new Crawler('<html><body><h2>' . Strings::substrAfterFirstDelimiter($html, '<h2>Searching the Name field for:'));
                     $id = null;
@@ -56,15 +77,7 @@ if ('1' === ($_POST['submit'] ?? false)) {
                     'categ' => trim($categ = str_contains($categ = $domCrawler->filterXPath('//table[3]/tr[4]/td[3]')->text(), ':') ? trim(Strings::substrBeforeFirstDelimiter(Strings::substrAfterLastDelimiter($categ, ':'), ')')) : $categ),
                     'gender' => str_contains($categ, 'F') || str_contains($categ, 'W') ? '♀️' : '♂️',
                     'country' => trim(Strings::substrBeforeFirstDelimiter($domCrawler->filterXPath('//table[3]/tr[6]/td[2]')->text(), ' ')),
-                    'bests' => [
-                        '50km' => null,
-                        '50km_seconds' => 86400,
-                        '100km' => null,
-                        '100km_seconds' => 86400,
-                        '6h' => 0,
-                        '12h' => 0,
-                        '24h' => 0,
-                    ],
+                    'bests' => $bests,
                     'homonyms' => $homonyms,
                 ];
 
@@ -85,15 +98,7 @@ if ('1' === ($_POST['submit'] ?? false)) {
                 $line = preg_replace('/\s/', ' ', $line);
                 $runners[] = [
                     'name' => strtoupper($line),
-                    'bests' => [
-                        '50km' => null,
-                        '50km_seconds' => 86400,
-                        '100km' => null,
-                        '100km_seconds' => 86400,
-                        '6h' => 0,
-                        '12h' => 0,
-                        '24h' => 0,
-                    ],
+                    'bests' => $bests,
                     'homonyms' => [],
                 ];
             }
@@ -136,10 +141,13 @@ else {
                     <label for="distance">Sort by</label>
                     <select name="distance" id="distance">
                         <option value="50km"<?= '50k' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>50k</option>
+                        <option value="50mi"<?= '50mi' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>50M</option>
                         <option value="100km"<?= '100km' === ($_POST['distance'] ?? '100km') ? " selected='selected'" : ''?>>100k</option>
+                        <option value="100mi"<?= '100mi' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>100M</option>
                         <option value="6h"<?= '6h' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>6H</option>
                         <option value="12h"<?= '12h' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>12H</option>
                         <option value="24h"<?= '24h' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>24H</option>
+                        <option value="48h"<?= '48h' === ($_POST['distance'] ?? '') ? " selected='selected'" : ''?>>48H</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -160,11 +168,11 @@ else {
                             <th class="text-center" scope="col">Category</th>
                             <th class="text-center" scope="col">Country</th>
                             <th class="text-center" scope="col">Club</th>
-                            <th class="text-center" scope="col">50k</th>
-                            <th class="text-center" scope="col">100k</th>
-                            <th class="text-center" scope="col">6H</th>
-                            <th class="text-center" scope="col">12H</th>
-                            <th class="text-center" scope="col">24H</th>
+                            <?php foreach($bests as $key => $value): ?>
+                                <?php if (!str_contains($key, '_seconds')): ?>
+                                    <th class="text-center" scope="col"><?= $key ?></th>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
                             <th class="text-center" scope="col">Homonyms</th>
                         </tr>
                         </thead>
@@ -177,11 +185,11 @@ else {
                                 <td class="text-center"><?= $data['categ'] ?? '-' ?></td>
                                 <td class="text-center"><?= $data['country'] ?? '-' ?></td>
                                 <td class="text-center"><?= $data['club'] ?? '-' ?></td>
-                                <td class="text-center"><?= $data['bests']['50km'] ?? '-' ?></td>
-                                <td class="text-center"><?= $data['bests']['100km'] ?? '-' ?></td>
-                                <td class="text-center"><?= !empty($data['bests']['6h']) ? $data['bests']['6h'] . 'k' : '-' ?></td>
-                                <td class="text-center"><?= !empty($data['bests']['12h']) ? $data['bests']['12h'] . 'k' : '-' ?></td>
-                                <td class="text-center"><?= !empty($data['bests']['24h']) ? $data['bests']['24h'] . 'k' : '-' ?></td>
+                                <?php foreach($bests as $key => $value): ?>
+                                    <?php if (!str_contains($key, '_seconds')): ?>
+                                        <td class="text-center"><?= !empty($data['bests'][$key]) ? (str_contains($data['bests'][$key], 'h') ? ($data['bests'][$key] . 'k') : $data['bests'][$key]) : '-' ?></td>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
                                 <td class="text-center">
                                     <?php foreach ($data['homonyms'] as $index => $homonym): ?>
                                         <?= '<a href="https://statistik.d-u-v.org/getresultperson.php?runner=' . $homonym . '" target="_blank">' . ((int)$index + 1) . '</a>' ?>
