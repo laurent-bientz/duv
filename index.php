@@ -112,9 +112,11 @@ if (!empty($gender)) {
 }
 $sort = ($_POST['distance'] ?? '100km');
 if (!str_contains($sort, 'h')) {
+    // sort by time in seconds DESC
     usort($runners, fn($a, $b) => $a['bests'][$sort . '_seconds'] === $b['bests'][$sort . '_seconds'] ? 0 : (($a['bests'][$sort . '_seconds'] < $b['bests'][$sort . '_seconds']) ? -1 : 1));
 }
 else {
+    // sort by distance ASC
     usort($runners, fn($a, $b) => $a['bests'][$sort] === $b['bests'][$sort] ? 0 : (($a['bests'][$sort] < $b['bests'][$sort]) ? 1 : -1));
 }
 ?>
